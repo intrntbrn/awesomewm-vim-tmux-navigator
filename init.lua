@@ -112,11 +112,7 @@ function module.focus(dir)
 			root.fake_input("key_press", "Super_L")
 			return
 		else
-			if collision then
-				collision.focus(dir, c)
-			else
-				awful.client.focus.global_bydirection(dir)
-			end
+			awful.client.focus.global_bydirection(dir)
 		end
 	end
 end

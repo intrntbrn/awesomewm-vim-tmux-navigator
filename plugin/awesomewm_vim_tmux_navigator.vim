@@ -89,9 +89,9 @@ function! s:TmuxAwareNavigate(direction)
 
 	let dir = s:CmdToDir(a:direction)
 
-    let cmd = 'sh ~/.bin/tmux_smart.sh '. dir
+    let cmd = 'sh ~/.config/awesome/awesomewm-vim-tmux-navigator/tmux_focus.sh '. dir
     silent call system(cmd)
-    let output= system("tmux run-shell 'tmux rename-window #{pane_current_command}'")
+    " let output= system("tmux run-shell 'tmux rename-window #{pane_current_command}'")
 
     "if tmux_pane == s:TmuxGetActivePaneId()
         "call s:SystemWindowNavigate(a:direction)
