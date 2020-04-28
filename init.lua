@@ -17,73 +17,28 @@ local keys = {
 	right = { "l" }
 }
 
-local function loadrequire(mod)
-	local function requiref(mdl)
-		require(mdl)
-	end
-	local res = pcall(requiref, mod)
-	return res
-end
-
 local function new(ks)
 	keys = ks or keys
 	local aw = {}
 
-	local use_collision = loadrequire("collision")
-	if use_collision then
-		collision = require("collision"){} -- load collision without any keybinds
-	end
-
-	if use_collision then
-		glib.idle_add(glib.PRIORITY_DEFAULT_IDLE, function()
-			for k, v in pairs(keys) do
-				for _, key_name in ipairs(v) do
-					aw[#aw + 1] = awful.key(
-						{ "Mod4" },
-						key_name,
-						function()
-							module.focus(k)
-						end,
-						{
-							description = "Change focus to the " .. key_name .. " Window / Tmux Pane / VIM Split",
-							group = "Navigator"
-						}
-					)
-					aw[#aw + 1] = awful.key(
-						{ "Mod4", "Shift" },
-						key_name,
-						function()
-							collision.move(k)
-						end,
-						{
-							description = "Move to the " .. key_name,
-							group = "Collision"
-						}
-					)
-				end
+	glib.idle_add(glib.PRIORITY_DEFAULT_IDLE, function()
+		for k, v in pairs(keys) do
+			for _, key_name in ipairs(v) do
+				aw[#aw + 1] = awful.key(
+					{ "Mod4" },
+					key_name,
+					function()
+						module.focus(k)
+					end,
+					{
+						description = "Change focus to the " .. key_name .. " window",
+						group = "Navigator"
+					}
+				)
 			end
-			capi.root.keys(awful.util.table.join(capi.root.keys(), unpack(aw)))
-		end)
-	else
-		glib.idle_add(glib.PRIORITY_DEFAULT_IDLE, function()
-			for k, v in pairs(keys) do
-				for _, key_name in ipairs(v) do
-					aw[#aw + 1] = awful.key(
-						{ "Mod4" },
-						key_name,
-						function()
-							module.focus(k)
-						end,
-						{
-							description = "Change focus to the " .. key_name .. " window",
-							group = "Navigator"
-						}
-					)
-				end
-			end
-			capi.root.keys(awful.util.table.join(capi.root.keys(), unpack(aw)))
-		end)
-	end
+		end
+		capi.root.keys(awful.util.table.join(capi.root.keys(), unpack(aw)))
+	end)
 	return module
 end
 
