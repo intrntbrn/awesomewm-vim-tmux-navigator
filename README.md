@@ -1,8 +1,16 @@
 AwesomeWM - Vim - Tmux Navigator
 ==================
 
-This plugin lets you navigate seamlessly between system windows, vim splits and tmux panes using a consisent set of hotkeys.
-Based on [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) and [fogine/vim-i3wm-tmux-navigator](https://github.com/fogine/vim-i3wm-tmux-navigator).
+<p align="center">
+  <img src="https://s7.gifyu.com/images/magic2c10caab0952e59d4.gif">
+</p>
+
+`awesomewm-vim-tmux-navigator` lets you navigate seamlessly between system windows, vim splits and tmux panes using a consisent set of hotkeys.
+It's based on [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) and [fogine/vim-i3wm-tmux-navigator](https://github.com/fogine/vim-i3wm-tmux-navigator).
+
+How does it work
+------------
+The plugin detects the focused application and simulates the correct keypresses so you can forget whether you are using tmux, vim, or another application.
 
 Installation
 ------------
@@ -10,12 +18,11 @@ Installation
 ### AwesomeWM
 Clone the repo.
 ```
-cd ~/.config/awesome
-git clone https://github.com/intrntbrn/awesomewm-vim-tmux-navigator
+git clone https://github.com/intrntbrn/awesomewm-vim-tmux-navigator ~/.config/awesome/awesomewm-vim-tmux-navigator
 ```
-This path is hardcoded in some configuration files.
+It's not recommended to change the path since it's hardcoded in some configuration files.
 
-Add your preferred navigation keybinds to `rc.lua` (e.g. <kbd>Mod4</kbd>+<kbd>arrow</kbd> or <kbd>Mod4</kbd>+<kbd>hjkl</kbd>)
+Add your preferred navigation (focus) keybinds to `rc.lua` (e.g. <kbd>Mod4</kbd>+<kbd>arrow</kbd> or <kbd>Mod4</kbd>+<kbd>hjkl</kbd>)
 
 ```
 require("awesomewm-vim-tmux-navigator"){
