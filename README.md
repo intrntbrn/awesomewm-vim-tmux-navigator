@@ -15,7 +15,7 @@ How does it work
 ------------
 The plugin sends the correct keypresses based on the focused appplication.
 In order to differentitate between (n)vim and tmux clients, the title of your terminal is changed.
-Therefore your shell/terminal stack has to support dynamic titles.
+Therefore your shell/terminal stack has to support dynamic titles (see Troubleshooting section).
 
 Installation
 ------------
@@ -66,8 +66,21 @@ bind -n C-Right if-shell "$is_vim" "send-keys C-l" "run-shell 'sh ~/.config/awes
 
 Troubleshooting
 ---------------
-
-Most likely your terminal is `xterm` and does not support dynamic titles.
-
 After a correct installation the title of a tmux session should end with "- TMUX" and "- VIM" or "- NVIM" for vim or nvim sessions respectively.
 You can check the title (property `WM_NAME`) by using `xprop`.
+
+In case your title does not change, your terminal and/or shell do not support dynamic titles.
+
+- `xterm` does not support dynamic titles. Time to move on, boomer.
+- Your shell is not configured. Try the provided minimal configurations for `zsh` or `bash`: 
+
+```
+echo "source ~/.config/awesome/awesomewm-vim-tmux-navigator/dynamictitles.zsh" >> ~/.zshrc
+```
+
+or
+
+```
+echo "source ~/.config/awesome/awesomewm-vim-tmux-navigator/dynamictitles.bash" >> ~/.bashrc
+```
+
