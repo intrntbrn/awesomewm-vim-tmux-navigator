@@ -67,7 +67,7 @@ bind -n C-Right if-shell "$is_vim" "send-keys C-l" "run-shell 'sh ~/.config/awes
 Troubleshooting
 ---------------
 After a correct installation the title of a tmux session should end with "- TMUX" and "- VIM" or "- NVIM" for vim or nvim sessions respectively.
-You can check the title (property `WM_NAME`) by using `xprop`.
+Check the title of the terminal client in your wm tasklist or by using `xprop` (title is property `WM_NAME`).
 
 In case your title does not change, your terminal and/or shell do not support dynamic titles.
 
