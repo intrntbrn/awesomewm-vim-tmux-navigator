@@ -6,11 +6,16 @@ AwesomeWM - Vim - Tmux Navigator
 </p>
 
 `awesomewm-vim-tmux-navigator` lets you navigate seamlessly between system windows, vim splits and tmux panes using a consisent set of hotkeys.
-It's based on [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) and [fogine/vim-i3wm-tmux-navigator](https://github.com/fogine/vim-i3wm-tmux-navigator).
+Every vim split and tmux pane is treated like a standalone system window and you can forget your (n)vim/tmux specific navigation hotkeys.
+It also works for complex scenarios like embedded vim splits inside tmux panes.
+
+The plugin is based on [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) and [fogine/vim-i3wm-tmux-navigator](https://github.com/fogine/vim-i3wm-tmux-navigator).
 
 How does it work
 ------------
-The plugin detects the focused application and simulates the correct keypresses so you can forget whether you are using tmux, vim, or another application.
+The plugin sends the correct keypresses based on the focused appplication.
+In order to differentitate between (n)vim and tmux clients, the title of your terminal is changed.
+Therefore your shell/terminal stack has to support dynamic titles.
 
 Installation
 ------------
@@ -20,7 +25,7 @@ Clone the repo.
 ```
 git clone https://github.com/intrntbrn/awesomewm-vim-tmux-navigator ~/.config/awesome/awesomewm-vim-tmux-navigator
 ```
-It's not recommended to change the path since it's hardcoded in some configuration files.
+It's not recommended to change the path since it's hardcoded in other configuration files.
 
 Add your preferred navigation (focus) keybinds to `rc.lua` (e.g. <kbd>Mod4</kbd>+<kbd>arrow</kbd> or <kbd>Mod4</kbd>+<kbd>hjkl</kbd>)
 
@@ -58,3 +63,11 @@ bind -n C-Down if-shell "$is_vim" "send-keys C-j" "run-shell 'sh ~/.config/aweso
 bind -n C-Up if-shell "$is_vim" "send-keys C-k" "run-shell 'sh ~/.config/awesome/awesomewm-vim-tmux-navigator/tmux_focus.sh up'"
 bind -n C-Right if-shell "$is_vim" "send-keys C-l" "run-shell 'sh ~/.config/awesome/awesomewm-vim-tmux-navigator/tmux_focus.sh right'"
 ```
+
+Troubleshooting
+---------------
+
+Most likely your terminal is `xterm` and does not support dynamic titles.
+
+After a correct installation the title of a tmux session should end with "- TMUX" and "- VIM" or "- NVIM" for vim or nvim sessions respectively.
+You can check the title (property `WM_NAME`) by using `xprop`.
