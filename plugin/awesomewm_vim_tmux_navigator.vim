@@ -21,6 +21,10 @@ function! s:UseTmuxNavigatorMappings()
   return !exists("g:tmux_navigator_no_mappings") || !g:tmux_navigator_no_mappings
 endfunction
 
+function! s:UseTmuxNavigatorMappingsInInsertMode()
+  return exists("g:tmux_navigator_insert_mode")
+endfunction
+
 function! s:InTmuxSession()
   return $TMUX != ''
 endfunction
@@ -65,15 +69,11 @@ function! s:TmuxGetActivePaneId()
 endfunction
 
 function! s:TmuxAwareNavigate(direction)
-
   let nr = winnr()
-  "let tmux_pane = ''
-  "let tmux_pane  = s:TmuxGetActivePaneId()
   let tmux_last_pane = (a:direction == 'p' && s:tmux_is_last_pane)
   if !tmux_last_pane
     call s:VimNavigate(a:direction)
   endif
-
 
   " Forward the switch panes command to tmux if:
   " a) we're toggling between the last tmux pane;
@@ -91,11 +91,6 @@ function! s:TmuxAwareNavigate(direction)
 
     let cmd = 'sh ~/.config/awesome/awesomewm-vim-tmux-navigator/tmux_focus.sh '. dir
     silent call system(cmd)
-    " let output= system("tmux run-shell 'tmux rename-window #{pane_current_command}'")
-
-    "if tmux_pane == s:TmuxGetActivePaneId()
-        "call s:SystemWindowNavigate(a:direction)
-    "endif
 
     if s:NeedsVitalityRedraw()
       redraw!
@@ -118,10 +113,9 @@ func! s:SystemWindowNavigate(cmd)
 	if a:cmd == 'p'
         finish
     endif
-
 	let dir = s:CmdToDir(a:cmd)
+    call system('awesome-client ''require("awful.client").focus.global_bydirection("' . dir . '") ''')
 
-	call system('awesome-client ''require("awful.client").focus.global_bydirection("' . dir . '") '' ')
     if !has("gui_running")
         redraw!
     endif
@@ -151,4 +145,11 @@ if s:UseTmuxNavigatorMappings()
   nnoremap <silent> <c-k> :TmuxNavigateUp<cr>
   nnoremap <silent> <c-l> :TmuxNavigateRight<cr>
   nnoremap <silent> <c-\> :TmuxNavigatePrevious<cr>
+  if s:UseTmuxNavigatorMappingsInInsertMode()
+    inoremap <silent> <c-h> <Esc>:TmuxNavigateLeft<cr>
+    inoremap <silent> <c-j> <Esc>:TmuxNavigateDown<cr>
+    inoremap <silent> <c-k> <Esc>:TmuxNavigateUp<cr>
+    inoremap <silent> <c-l> <Esc>:TmuxNavigateRight<cr>
+    inoremap <silent> <c-\> <Esc>:TmuxNavigatePrevious<cr>
+  endif
 endif

@@ -48,6 +48,10 @@ Plug 'intrntbrn/awesomewm-vim-tmux-navigator'
 
 Remove similar plugins (like `christoomey/vim-tmux-navigator`).
 
+**Options:** 
+
+`let g:tmux_navigator_insert_mode = 1` to enable navigator keybinds in insert mode
+
 ### Tmux
 Add the following to your `tmux.conf`.
 ```tmux
