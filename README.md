@@ -73,10 +73,9 @@ Troubleshooting
 After a correct installation the title of a tmux session should end with "- TMUX" and "- VIM" or "- NVIM" for vim or nvim sessions respectively.
 Check the title of the terminal client in your wm tasklist or by using `xprop` (title is property `WM_NAME`).
 
-In case your title does not change, your terminal and/or shell do not support dynamic titles.
+In case your title does not change, your terminal and/or shell do not support dynamic titles or are not configured.
 
-- `xterm` does not support dynamic titles. Time to move on, boomer.
-- Your shell is not configured. Try the provided minimal configurations for `zsh` or `bash`: 
+Try minimal configurations provided for `zsh` or `bash`: 
 
 ```
 echo "source ~/.config/awesome/awesomewm-vim-tmux-navigator/dynamictitles.zsh" >> ~/.zshrc
@@ -88,3 +87,4 @@ or
 echo "source ~/.config/awesome/awesomewm-vim-tmux-navigator/dynamictitles.bash" >> ~/.bashrc
 ```
 
+I recommended to use `alacritty` with `zsh`.
