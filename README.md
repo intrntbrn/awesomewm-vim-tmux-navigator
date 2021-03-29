@@ -14,7 +14,7 @@ This plugin adds another layer to christoomey's plugin [vim-tmux-navigator](http
 How does it work
 ------------
 The plugin sends the correct keypresses based on the focused appplication.
-In order to differentitate between (n|g)vim and tmux clients, the title of your terminal is changed.
+In order to differentitate between vim and tmux clients, the title of your terminal is changed.
 
 If your shell/terminal stack is not configured to show dynamic titles, you can set the `experimental` flag, which will try to determine the focused application by using `pstree`.
 
@@ -105,4 +105,4 @@ Check the title of the terminal client in your wm tasklist or by using the termi
 
 In case your title does not change, your terminal and/or shell may not support dynamic titles. Try other.
 
-4. Set `experimental = true`. The experimental mode does not require dynamic titles, but might a bit slower due to having `pstree` to spawn.
+4. Set `experimental = true`. The experimental mode does not require dynamic titles, but might be a bit slower due to having `pstree` to spawn.
