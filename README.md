@@ -5,11 +5,11 @@ AwesomeWM - Vim - Tmux Navigator
   <img src="https://s7.gifyu.com/images/magic2c10caab0952e59d4.gif">
 </p>
 
-`awesomewm-vim-tmux-navigator` lets you navigate seamlessly between system windows, vim splits and tmux panes using a consisent set of hotkeys.
-Every vim split and tmux pane is treated like a standalone system window and you can forget your (n)vim/tmux specific navigation hotkeys.
-It also works for complex scenarios like embedded vim splits inside tmux panes.
+`awesomewm-vim-tmux-navigator` lets you navigate seamlessly between system windows, vim splits and tmux panes by only using your awesomewm navigation keybindings.
+Every vim split and tmux pane is treated like a regular system window, allowing you to forget your vim/tmux specific navigation hotkeys.
+It also works in complex scenarios like embedded vim splits inside tmux panes.
 
-The plugin is based on [christoomey/vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) and [fogine/vim-i3wm-tmux-navigator](https://github.com/fogine/vim-i3wm-tmux-navigator).
+This plugin adds another layer to christoomey's plugin [vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator), which does most of the heavy lifting.
 
 How does it work
 ------------
@@ -44,7 +44,7 @@ Please verify that `mod` and `mod_keysym` matches your actual awesomewm modifier
 For instance you might be using the right windows/super key and have to specify "Super_R" as your `mod_keysym`, or "Mod1" and "Alt_L" if you prefer to use the alt key.
 
 
-Remove conflicting keybinds from your `rc.lua`.
+Don't forget to remove your previously used navigation keybinds (or other conflicting keybinds) in `rc.lua`.
 
 ### Vim
 
@@ -60,7 +60,7 @@ Remove similar plugins (like `christoomey/vim-tmux-navigator`).
 `let g:tmux_navigator_insert_mode = 1` to enable navigator keybinds in insert mode
 
 ### Tmux
-Add the following to your `tmux.conf`.
+Add the following to your `tmux.conf` at the very bottom.
 ```tmux
 # Set Terminal titles where possible
 set-option -g set-titles on
@@ -94,4 +94,4 @@ or
 echo "source ~/.config/awesome/awesomewm-vim-tmux-navigator/dynamictitles.bash" >> ~/.bashrc
 ```
 
-I recommended to use `alacritty` with `zsh`.
+I recommend to use `alacritty` with `zsh`.
