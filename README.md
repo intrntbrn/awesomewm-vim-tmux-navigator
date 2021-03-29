@@ -2,7 +2,7 @@ AwesomeWM - Vim - Tmux Navigator
 ==================
 
 <p align="center">
-  <img src="https://s7.gifyu.com/images/magic2c10caab0952e59d4.gif">
+  <img src="https://user-images.githubusercontent.com/1234183/112910543-d9c5be80-90f3-11eb-840a-8c1d549c76ff.gif">
 </p>
 
 `awesomewm-vim-tmux-navigator` lets you navigate seamlessly between system windows, vim splits and tmux panes by only using your awesomewm navigation keybindings.
