@@ -14,8 +14,10 @@ This plugin adds another layer to christoomey's plugin [vim-tmux-navigator](http
 How does it work
 ------------
 The plugin sends the correct keypresses based on the focused appplication.
-In order to differentitate between (n)vim and tmux clients, the title of your terminal is changed.
-Therefore your shell/terminal stack has to support dynamic titles (see Troubleshooting section).
+In order to differentitate between (n|g)vim and tmux clients, the title of your terminal is changed.
+
+If your shell/terminal stack is not configured to show dynamic titles, you can set the `experimental` flag, which will try to determine the focused application by using `pstree`.
+
 
 Installation
 ------------
@@ -36,7 +38,8 @@ require("awesomewm-vim-tmux-navigator") {
     left = {"Left", "h"},
     right = {"Right", "l"},
     mod = "Mod4",
-    mod_keysym = "Super_L"
+    mod_keysym = "Super_L",
+    --experimental = true
 }
 ```
 
@@ -62,7 +65,7 @@ Remove similar plugins (like `christoomey/vim-tmux-navigator`).
 ### Tmux
 Add the following to your `tmux.conf` at the very bottom.
 ```tmux
-# Set Terminal titles where possible
+# Set title suffix to "- TMUX"
 set-option -g set-titles on
 set-option -g set-titles-string '#S: #W - TMUX'
 
@@ -77,12 +80,11 @@ bind -n C-Right if-shell "$is_vim" "send-keys C-l" "run-shell 'sh ~/.config/awes
 
 Troubleshooting
 ---------------
-After a correct installation the title of a tmux session should end with "- TMUX" and "- VIM" or "- NVIM" for vim or nvim sessions respectively.
-Check the title of the terminal client in your wm tasklist or by using `xprop` (title is property `WM_NAME`).
+1. Make sure there are no conflicting keybindings.
 
-In case your title does not change, your terminal and/or shell do not support dynamic titles or are not configured.
+2. Check https://github.com/christoomey/vim-tmux-navigator#troubleshooting.
 
-Try minimal configurations provided for `zsh` or `bash`: 
+3. Try to enable dynamic titles in your shell. Minimal configurations are provided for `zsh` and `bash`:
 
 ```
 echo "source ~/.config/awesome/awesomewm-vim-tmux-navigator/dynamictitles.zsh" >> ~/.zshrc
@@ -94,4 +96,9 @@ or
 echo "source ~/.config/awesome/awesomewm-vim-tmux-navigator/dynamictitles.bash" >> ~/.bashrc
 ```
 
-I recommend to use `alacritty` with `zsh`.
+After a correct installation the title of a tmux session should end with "- TMUX" and "- VIM" or "- NVIM" for vim or nvim sessions respectively.
+Check the title of the terminal client in your wm tasklist or by using the terminal application `xprop` (title is property `WM_NAME`).
+
+In case your title does not change, your terminal and/or shell may not support dynamic titles. Try other.
+
+4. Try to set `experimental = true`. This requires you to have the application `pstree` from package `psmisc` installed.
