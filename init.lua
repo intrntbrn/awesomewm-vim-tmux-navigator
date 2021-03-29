@@ -87,7 +87,7 @@ local function new(args)
             local c = client.focus
             local pid = c and c.pid or -1
             awful.spawn.easy_async("pstree -A -T " .. pid, function(out)
-                if string.find(out, "^[^%s].*%-tmux: client") then
+                if string.find(out, "[^.*\n]%-tmux: client") then
                     keygrabber.stop()
                     root.fake_input("key_release", mod_keysym)
                     root.fake_input("key_press", "Control_L")
@@ -118,8 +118,8 @@ local function new(args)
                     root.fake_input("key_press", mod_keysym)
                     return
                 else
-                    if string.find(out, "^[^%s].*%-n?vim$") or string.find(out, "^[^%s].*%-n?vim%-") or
-                        string.find(out, "^gvim") or string.find(out, "^gvim%-") then
+                    if string.find(out, "[^.*\n]%-n?vim$") or string.find(out, "[^.*\n]%-n?vim%-") or
+                        string.find(out, "^gvim$") or string.find(out, "^gvim%-") then
                         keygrabber.stop()
                         root.fake_input("key_release", mod_keysym)
                         root.fake_input("key_release", "Control_L")
