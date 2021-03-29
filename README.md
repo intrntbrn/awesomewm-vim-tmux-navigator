@@ -43,7 +43,7 @@ require("awesomewm-vim-tmux-navigator") {
 }
 ```
 
-Please verify that `mod` and `mod_keysym` matches your actual awesomewm modifier key by using the terminal application `xev`.
+Please verify that `mod` and `mod_keysym` matches your actual awesomewm modifier key by using the terminal applications `xev` and `xmodmap`.
 For instance you might be using the right windows/super key and have to specify "Super_R" as your `mod_keysym`, or "Mod1" and "Alt_L" if you prefer to use the alt key.
 
 
@@ -101,4 +101,4 @@ Check the title of the terminal client in your wm tasklist or by using the termi
 
 In case your title does not change, your terminal and/or shell may not support dynamic titles. Try other.
 
-4. Try to set `experimental = true`. This requires you to have the application `pstree` from package `psmisc` installed.
+4. Set `experimental = true`. The experimental mode does not require dynamic titles, but might a bit slower due to having `pstree` to spawn.
