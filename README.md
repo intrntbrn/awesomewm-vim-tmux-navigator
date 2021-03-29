@@ -27,16 +27,23 @@ git clone https://github.com/intrntbrn/awesomewm-vim-tmux-navigator ~/.config/aw
 ```
 It's not recommended to change the path since it's hardcoded in other configuration files.
 
-Add your preferred navigation (focus) keybinds to `rc.lua` (e.g. <kbd>Mod4</kbd>+<kbd>arrow</kbd> or <kbd>Mod4</kbd>+<kbd>hjkl</kbd>)
+Add your preferred navigation (focus) keybinds to `rc.lua` (e.g. <kbd>Mod4</kbd>+<kbd>arrows</kbd> or <kbd>Mod4</kbd>+<kbd>hjkl</kbd>)
 
 ```
-require("awesomewm-vim-tmux-navigator"){
-        up    = {"Up", "k"},
-        down  = {"Down", "j"},
-        left  = {"Left", "h"},
-        right = {"Right", "l"},
-    }
+require("awesomewm-vim-tmux-navigator") {
+    up = {"Up", "k"},
+    down = {"Down", "j"},
+    left = {"Left", "h"},
+    right = {"Right", "l"},
+    mod = "Mod4",
+    mod_keysym = "Super_L"
+}
 ```
+
+Please verify that `mod` and `mod_keysym` matches your actual awesomewm modifier key by using the terminal application `xev`.
+For instance you might be using the right windows/super key and have to specify "Super_R" as your `mod_keysym`, or "Mod1" and "Alt_L" if you prefer to use the alt key.
+
+
 Remove conflicting keybinds from your `rc.lua`.
 
 ### Vim
