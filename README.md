@@ -76,10 +76,10 @@ bind -n C-Left if-shell "$is_vim" "send-keys C-h" "run-shell 'sh ~/.config/aweso
 bind -n C-Down if-shell "$is_vim" "send-keys C-j" "run-shell 'sh ~/.config/awesome/awesomewm-vim-tmux-navigator/tmux_focus.sh down'"
 bind -n C-Up if-shell "$is_vim" "send-keys C-k" "run-shell 'sh ~/.config/awesome/awesomewm-vim-tmux-navigator/tmux_focus.sh up'"
 bind -n C-Right if-shell "$is_vim" "send-keys C-l" "run-shell 'sh ~/.config/awesome/awesomewm-vim-tmux-navigator/tmux_focus.sh right'"
-bind-key -T copy-mode-vi 'C-Left' select-pane -L
-bind-key -T copy-mode-vi 'C-Down' select-pane -D
-bind-key -T copy-mode-vi 'C-Up' select-pane -U
-bind-key -T copy-mode-vi 'C-Right' select-pane -R
+bind-key -T copy-mode-vi 'C-Left' "run-shell 'sh ~/.config/awesome/awesomewm-vim-tmux-navigator/tmux_focus.sh left'"
+bind-key -T copy-mode-vi 'C-Down' "run-shell 'sh ~/.config/awesome/awesomewm-vim-tmux-navigator/tmux_focus.sh down'"
+bind-key -T copy-mode-vi 'C-Up' "run-shell 'sh ~/.config/awesome/awesomewm-vim-tmux-navigator/tmux_focus.sh up'"
+bind-key -T copy-mode-vi 'C-Right' "run-shell 'sh ~/.config/awesome/awesomewm-vim-tmux-navigator/tmux_focus.sh right'"
 ```
 
 Troubleshooting
