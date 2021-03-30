@@ -4,11 +4,12 @@ local unpack = unpack or table.unpack -- luacheck: globals unpack
 local module = {}
 
 local function new(args)
-    local client, root, keygrabber = client, root, keygrabber -- luacheck: globals client root keygrabber
+    local awesome, client, root, keygrabber = awesome, client, root, keygrabber -- luacheck: globals client root keygrabber
     local keys = args or {up = {"k", "Up"}, down = {"j", "Down"}, left = {"h", "Left"}, right = {"l", "Right"}}
 
     local mod = keys.mod or "Mod4"
     local mod_keysym = keys.mod_keysym or "Super_L"
+    local focus = keys.focus or awful.client.focus.global_bydirection
 
     local tmux = {}
     tmux.left = function()
@@ -71,55 +72,54 @@ local function new(args)
         root.fake_input("key_press", mod_keysym)
     end
 
-    local focus = function(dir)
+    local navigate = function(dir)
         local c = client.focus
         local client_name = c and c.name or ""
         if string.find(client_name, "- N?VIM$") then
-            vim.navigate(dir)
-            return
+            return vim.navigate(dir)
         else
             if string.find(client_name, "- TMUX$") then
-                tmux.navigate(dir)
-                return
+                return tmux.navigate(dir)
             else
-                awful.client.focus.global_bydirection(dir)
+                focus(dir)
             end
         end
     end
 
     -- experimental version that uses pstree to determine the running application
     if keys.experimental then
-        focus = function(dir)
+        navigate = function(dir)
             local c = client.focus
             local pid = c and c.pid or -1
             awful.spawn.easy_async("pstree -A -T " .. pid, function(out)
                 if string.find(out, "[^.*\n]%-tmux: client") then
-                    tmux.navigate(dir)
-                    return
+                    return tmux.navigate(dir)
                 else
                     if string.find(out, "[^.*\n]%-n?vim$") or string.find(out, "[^.*\n]%-n?vim%-") or
                         string.find(out, "^gvim$") or string.find(out, "^gvim%-") then
-                        vim.navigate(dir)
-                        return
+                        return vim.navigate(dir)
                     else
-                        awful.client.focus.global_bydirection(dir)
+                        focus(dir)
                     end
                 end
             end)
         end
     end
 
+    awesome.connect_signal("navigator::focus", focus)
+
     keys.mod = nil
     keys.mod_keysym = nil
     keys.experimental = nil
+    keys.focus = nil
 
     local aw = {}
     glib.idle_add(glib.PRIORITY_DEFAULT_IDLE, function()
         for k, v in pairs(keys) do
             for _, key_name in ipairs(v) do
                 aw[#aw + 1] = awful.key({mod}, key_name, function()
-                    focus(k)
-                end, {description = "focus " .. k .. " window", group = "client"})
+                    navigate(k)
+                end, {description = "navigate " .. k, group = "client"})
             end
         end
         root.keys(awful.util.table.join(root.keys(), unpack(aw)))

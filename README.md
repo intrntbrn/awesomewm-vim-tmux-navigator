@@ -49,6 +49,8 @@ For instance you might be using the right windows/super key and have to specify 
 
 Don't forget to remove your previously used navigation keybinds (or other conflicting keybinds) in `rc.lua`.
 
+It is possible to use a custom focus function by defining `focus`. Default is `awful.client.focus.global_bydirection`.
+
 ### Vim
 
 

@@ -3,7 +3,7 @@
 dir=$1
 
 wm_focus() {
-	awesome-client 'require("awful.client").focus.global_bydirection("'"$dir"'")'
+	awesome-client 'awesome.emit_signal("navigator::focus", "'"$dir"'")'
 }
 
 case "$dir" in

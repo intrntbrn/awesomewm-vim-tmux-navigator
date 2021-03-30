@@ -114,7 +114,7 @@ func! s:SystemWindowNavigate(cmd)
         finish
     endif
 	let dir = s:CmdToDir(a:cmd)
-    call system('awesome-client ''require("awful.client").focus.global_bydirection("' . dir . '") ''')
+    call system('awesome-client ''awesome.emit_signal("navigator::focus","' . dir . '")''')
 
     if !has("gui_running")
         redraw!
