@@ -103,8 +103,9 @@ local function new(args)
         end
     end
 
-    -- register focus signal
+    -- register signals
     awesome.connect_signal("navigator::focus", focus)
+    awesome.connect_signal("navigator::navigate", navigate)
 
     -- setup keybinds
     glib.idle_add(glib.PRIORITY_DEFAULT_IDLE, function()
