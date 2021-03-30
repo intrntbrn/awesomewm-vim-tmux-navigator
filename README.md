@@ -5,18 +5,23 @@ AwesomeWM - Vim - Tmux Navigator
   <img src="https://user-images.githubusercontent.com/1234183/112910543-d9c5be80-90f3-11eb-840a-8c1d549c76ff.gif">
 </p>
 
-`awesomewm-vim-tmux-navigator` lets you navigate seamlessly between system windows, vim splits and tmux panes by only using your awesomewm navigation keybindings.
-Every vim split and tmux pane is treated like a regular system window, allowing you to forget your vim/tmux specific navigation hotkeys.
-It also works in complex scenarios like embedded vim splits inside tmux panes.
+Usually vim and tmux have their own dedicated keybinds for navigation.
+Christoomey's plugin [vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator) allows you to the use the same keybinds for vim and tmux.
+This might be sufficient for floating wm users, but when using a tiling wm like awesomewm we can do better and add another layer.
 
-This plugin adds another layer to christoomey's plugin [vim-tmux-navigator](https://github.com/christoomey/vim-tmux-navigator), which does most of the heavy lifting.
+`awesomewm-vim-tmux-navigator` lets you navigate seamlessly between system windows, vim splits and tmux panes by only using your awesomewm navigation keybinds (e.g. <kbd>Mod4+hjkl</kbd>).
+Every vim split and tmux pane is treated like a standalone system window, allowing you to forget your vim/tmux specific navigation hotkeys.
 
 How does it work
 ------------
-The plugin sends the correct keypresses based on the focused appplication.
-In order to differentitate between vim and tmux clients, the title of your terminal is changed.
+It essentially works by sending the correct keypresses based on the context. 
+Therefore the plugin has to detect whether the current focused application is vim, tmux or any other system window.
 
-If your shell/terminal stack is not configured to show dynamic titles, you can set the `experimental` flag, which will try to determine the focused application by using `pstree`.
+The plugin offers two methods of determining the focused application:
+
+1. By using dynamic titles. The plugin tries to change the title (`WM_NAME`) of your terminal in order to differentitate between applications. However, not every shell-terminal-stack supports dynamic titles or is configured correctly out of the box. Minimal configurations are provided for `zsh` and `bash`.
+
+2. By using `pstree`. This should theoretically work on every setup, but it might perform slower due to having an extra process to spawn. This method can be enabled by setting the `experimental` flag.
 
 
 Installation
@@ -29,7 +34,7 @@ git clone https://github.com/intrntbrn/awesomewm-vim-tmux-navigator ~/.config/aw
 ```
 It's not recommended to change the path since it's hardcoded in other configuration files.
 
-Add your preferred navigation (focus) keybinds to `rc.lua` (e.g. <kbd>Mod4</kbd>+<kbd>arrows</kbd> or <kbd>Mod4</kbd>+<kbd>hjkl</kbd>)
+Add your preferred navigation (focus) keybinds to `rc.lua` (e.g. <kbd>Mod4</kbd>+<kbd>arrows</kbd> or <kbd>Mod4</kbd>+<kbd>hjkl</kbd>):
 
 ```
 require("awesomewm-vim-tmux-navigator") {
@@ -44,21 +49,21 @@ require("awesomewm-vim-tmux-navigator") {
 ```
 
 Please verify that `mod` and `mod_keysym` matches your actual awesomewm modifier key by using the terminal applications `xev` and `xmodmap`.
-For instance you might be using the right windows/super key and have to specify "Super_R" as your `mod_keysym`, or "Mod1" and "Alt_L" if you prefer to use the alt key.
-
+For instance you might press the right super key and have to specify "Super_R" as your `mod_keysym`, or "Mod1" and "Alt_L" if you prefer to use the alt key.
 
 Don't forget to remove your previously used navigation keybinds (or other conflicting keybinds) in `rc.lua`.
 
-It is possible to use a custom focus function by defining `focus`. Default is `awful.client.focus.global_bydirection`.
+If you like to use your own custom directional focus function, you can do this by defining `focus`.
+Default is `awful.client.focus.global_bydirection`.
 
 ### Vim
-
+Install using your favorite package manager, e.g. `vim-plug`: 
 
 ```vim
 Plug 'intrntbrn/awesomewm-vim-tmux-navigator'
 ```
 
-Remove similar plugins (like `christoomey/vim-tmux-navigator`).
+Remove `christoomey/vim-tmux-navigator` if you are using it.
 
 **Options:** 
 
@@ -70,7 +75,6 @@ Add the following to your `tmux.conf` at the very bottom.
 # Set title suffix to "- TMUX"
 set-option -g set-titles on
 set-option -g set-titles-string '#S: #W - TMUX'
-
 # Smart pane switching with awareness of vim splits and system windows
 is_vim="ps -o state= -o comm= -t '#{pane_tty}' \
 	| grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|n?vim?x?)(diff)?$'"
@@ -107,4 +111,18 @@ Check the title of the terminal client in your wm tasklist or by using the termi
 
 In case your title does not change, your terminal and/or shell may not support dynamic titles. Try other.
 
-4. Set `experimental = true`. The experimental mode does not require dynamic titles, but might be a bit slower due to having `pstree` to spawn.
+4. Set `experimental = true`. The experimental mode does not require dynamic titles, but might be a bit slower.
+
+Integration
+---------------
+This plugin can be used from everywhere and does not require any kind of import or reference.
+
+Awesomewm: `awesome.emit_signal("navigator::navigate", "left")`
+
+Shell: `echo 'awesome.emit_signal("navigator::navigate", "up")' | awesome-client`
+
+
+
+
+
+
