@@ -1,9 +1,78 @@
 local awful = require("awful")
 local glib = require("lgi").GLib
+local gears = require("gears")
 local unpack = unpack or table.unpack -- luacheck: globals unpack
+local awesome, keygrabber, client, root = awesome, keygrabber, client, root
 local module = {}
 
+local function run_key_sequence(seq)
+	keygrabber.stop()
+	for _, s in ipairs(seq) do
+		if s.action == "press" then
+			root.fake_input("key_press", s.key)
+			print("key_press: " .. s.key)
+		elseif s.action == "release" then
+			root.fake_input("key_release", s.key)
+			print("key_release: " .. s.key)
+		elseif s.action == "press_and_release" then
+			root.fake_input("key_release", s.key)
+			root.fake_input("key_press", s.key)
+			root.fake_input("key_release", s.key)
+		end
+	end
+end
+
+local function run_key_sequence_xdotool(seq)
+	keygrabber.stop()
+
+	-- combine inputs to speed things up
+	local queue = nil
+
+	local combine = true
+
+	print("")
+
+	local run_fn = function(s)
+		if s.action == "press" then
+			if s.is_combined then
+				awful.spawn("xdotool key " .. s.key)
+				print("xdotool key " .. s.key)
+			else
+				awful.spawn("xdotool keydown " .. s.key)
+				print("xdotool keydown " .. s.key)
+			end
+		elseif s.action == "release" then
+			if s.is_combined then
+			else
+				awful.spawn("xdotool keyup " .. s.key)
+				print("xdotool keyup " .. s.key)
+			end
+		elseif s.action == "press_and_release" then
+			awful.spawn("xdotool key " .. s.key)
+			print("key " .. s.key)
+		end
+	end
+
+	for _, s in ipairs(seq) do
+		if queue then
+			if combine and s.action == queue.action then
+				queue.key = string.format("%s+%s", queue.key, s.key)
+				queue.is_combined = true
+			else
+				run_fn(queue)
+				queue = s
+			end
+		else
+			queue = s
+		end
+	end
+
+	run_fn(queue)
+end
+
+-- get key sequence to transition from current mods to next mods
 local change_mods = function(current, next)
+	local sequence = {}
 	local intersect = {}
 
 	-- determine mods that needs to be released
@@ -16,7 +85,7 @@ local change_mods = function(current, next)
 			end
 		end
 		if is_unique then
-			root.fake_input("key_release", c)
+			table.insert(sequence, { action = "release", key = c })
 		else
 			intersect[#intersect + 1] = c
 		end
@@ -32,13 +101,14 @@ local change_mods = function(current, next)
 			end
 		end
 		if is_unique then
-			root.fake_input("key_press", n)
+			table.insert(sequence, { action = "press", key = n })
 		end
 	end
+
+	return sequence
 end
 
 local function new(args)
-	local awesome, client, root, keygrabber = awesome, client, root, keygrabber -- luacheck: awesome globals client root keygrabber
 	local cfg = args
 		or { up = { "k", "Up" }, down = { "j", "Down" }, left = { "h", "Left" }, right = {
 			"l",
@@ -57,6 +127,8 @@ local function new(args)
 		right = cfg.right,
 	}
 
+	local use_xdotool = cfg.use_xdotool or true
+
 	local tmux_keys = cfg.tmux
 		or {
 			mods = { "Control_L" },
@@ -74,75 +146,52 @@ local function new(args)
 		right = "l",
 	}
 
-	local switch_mods_fn = function(current_mods, next_mods, fn, dir)
-		keygrabber.stop()
-		change_mods(current_mods, next_mods)
-		fn(dir)
-		change_mods(next_mods, current_mods)
+	local get_key_sequence = function(current_mods, next_mods, fn, dir)
+		local sequence = {}
+		-- release wm mods, press vim/tmux mods
+		gears.table.merge(sequence, change_mods(current_mods, next_mods))
+
+		-- press navigation direction
+		gears.table.merge(sequence, fn(dir))
+
+		-- release vim/tmux mods, restore wm mods
+		gears.table.merge(sequence, change_mods(next_mods, current_mods))
+
+		return sequence
 	end
 
-	local tmux = {}
-	tmux.left = function()
-		root.fake_input("key_release", tmux_keys.left)
-		root.fake_input("key_press", tmux_keys.left)
-		root.fake_input("key_release", tmux_keys.left)
-	end
-	tmux.right = function()
-		root.fake_input("key_release", tmux_keys.right)
-		root.fake_input("key_press", tmux_keys.right)
-		root.fake_input("key_release", tmux_keys.right)
-	end
-	tmux.up = function()
-		root.fake_input("key_release", tmux_keys.up)
-		root.fake_input("key_press", tmux_keys.up)
-		root.fake_input("key_release", tmux_keys.up)
-	end
-	tmux.down = function()
-		root.fake_input("key_release", tmux_keys.down)
-		root.fake_input("key_press", tmux_keys.down)
-		root.fake_input("key_release", tmux_keys.down)
-	end
-	local tmux_navigate = function(dir)
-		tmux[dir]()
+	local navigate_tmux = function(dir)
+		return {
+			{ action = "release", key = tmux_keys[dir] },
+			{ action = "press", key = tmux_keys[dir] },
+			{ action = "release", key = tmux_keys[dir] },
+		}
 	end
 
-	local vim = {}
-	vim.left = function()
-		root.fake_input("key_release", vim_keys.left)
-		root.fake_input("key_press", vim_keys.left)
-		root.fake_input("key_release", vim_keys.left)
-	end
-	vim.right = function()
-		root.fake_input("key_release", vim_keys.right)
-		root.fake_input("key_press", vim_keys.right)
-		root.fake_input("key_release", vim_keys.right)
-	end
-	vim.up = function()
-		root.fake_input("key_release", vim_keys.up)
-		root.fake_input("key_press", vim_keys.up)
-		root.fake_input("key_release", vim_keys.up)
-	end
-	vim.down = function()
-		root.fake_input("key_release", vim_keys.down)
-		root.fake_input("key_press", vim_keys.down)
-		root.fake_input("key_release", vim_keys.down)
-	end
-	local vim_navigate = function(dir)
-		vim[dir]()
+	local navigate_vim = function(dir)
+		return {
+			--{ action = "release", key = vim_keys[dir] },
+			{ action = "press", key = vim_keys[dir] },
+			{ action = "release", key = vim_keys[dir] },
+		}
 	end
 
 	-- use dynamic titles to determine type of client (default)
 	local navigate = function(dir)
 		local c = client.focus
 		local client_name = c and c.name or ""
+
+		local run_fn = use_xdotool and run_key_sequence_xdotool or run_key_sequence
+
 		if string.find(client_name, "%- N?VIM$") then
-			switch_mods_fn(wm_keys.mods, vim_keys.mods, vim_navigate, dir)
+			run_fn(get_key_sequence(wm_keys.mods, vim_keys.mods, navigate_vim, dir))
 			return
 		elseif string.find(client_name, "%- TMUX$") then
-			switch_mods_fn(wm_keys.mods, tmux_keys.mods, tmux_navigate, dir)
+			run_fn(get_key_sequence(wm_keys.mods, tmux_keys.mods, navigate_tmux, dir))
 			return
 		else
 			focus(dir)
+			return
 		end
 	end
 
@@ -153,14 +202,16 @@ local function new(args)
 			local pid = c and c.pid or -1
 			awful.spawn.easy_async("pstree -A -T " .. pid, function(out)
 				if string.find(out, "[^.*\n]%-tmux: client") then
-					return tmux_navigate(dir)
+					get_key_sequence(wm_keys.mods, tmux_keys.mods, navigate_tmux, dir)
+					return
 				elseif
 					string.find(out, "[^.*\n]%-n?vim$")
 					or string.find(out, "[^.*\n]%-n?vim%-")
 					or string.find(out, "^gvim$")
 					or string.find(out, "^gvim%-")
 				then
-					return vim_navigate(dir)
+					get_key_sequence(wm_keys.mods, vim_keys.mods, navigate_vim, dir)
+					return
 				else
 					focus(dir)
 				end
