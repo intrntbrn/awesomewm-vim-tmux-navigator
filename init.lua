@@ -28,7 +28,7 @@ local function run_key_sequence_xdotool(seq)
 	-- combine inputs to speed things up
 	local queue = nil
 
-	local combine = true
+	local combine = false -- @WIP
 
 	print("")
 
@@ -176,12 +176,12 @@ local function new(args)
 		}
 	end
 
+	local run_fn = use_xdotool and run_key_sequence_xdotool or run_key_sequence
+
 	-- use dynamic titles to determine type of client (default)
 	local navigate = function(dir)
 		local c = client.focus
 		local client_name = c and c.name or ""
-
-		local run_fn = use_xdotool and run_key_sequence_xdotool or run_key_sequence
 
 		if string.find(client_name, "%- N?VIM$") then
 			run_fn(get_key_sequence(wm_keys.mods, vim_keys.mods, navigate_vim, dir))
@@ -202,7 +202,7 @@ local function new(args)
 			local pid = c and c.pid or -1
 			awful.spawn.easy_async("pstree -A -T " .. pid, function(out)
 				if string.find(out, "[^.*\n]%-tmux: client") then
-					get_key_sequence(wm_keys.mods, tmux_keys.mods, navigate_tmux, dir)
+					run_fn(get_key_sequence(wm_keys.mods, tmux_keys.mods, navigate_tmux, dir))
 					return
 				elseif
 					string.find(out, "[^.*\n]%-n?vim$")
@@ -210,7 +210,7 @@ local function new(args)
 					or string.find(out, "^gvim$")
 					or string.find(out, "^gvim%-")
 				then
-					get_key_sequence(wm_keys.mods, vim_keys.mods, navigate_vim, dir)
+					run_fn(get_key_sequence(wm_keys.mods, vim_keys.mods, navigate_vim, dir))
 					return
 				else
 					focus(dir)
