@@ -80,24 +80,26 @@ local function dump_sequence(seq)
 end
 
 local function new(args)
-	local cfg = args
-		or { up = { "k", "Up" }, down = { "j", "Down" }, left = { "h", "Left" }, right = {
-			"l",
-			"Right",
-		} }
+	local cfg = args or {}
 
 	local mod = cfg.mod or "Mod4"
 	local mod_keysym = cfg.mod_keysym or "Super_L"
+
+	local up = cfg.up or { "k", "Up" }
+	local down = cfg.down or { "j", "Down" }
+	local left = cfg.down or { "h", "Left" }
+	local right = cfg.down or { "l", "Right" }
+
 	local focus = cfg.focus or awful.client.focus.global_bydirection
-	local restore_mods = cfg.restore_mods or true
+	local dont_restore_mods = cfg.dont_restore_mods or false
 	local debug = cfg.debug or false
 
 	local wm_keys = {
 		mods = { mod_keysym },
-		up = cfg.up,
-		down = cfg.down,
-		left = cfg.left,
-		right = cfg.right,
+		up = up,
+		down = down,
+		left = left,
+		right = right,
 	}
 
 	local use_xdotool = cfg.use_xdotool or false
@@ -127,13 +129,9 @@ local function new(args)
 		-- press navigation direction
 		gears.table.merge(sequence, fn(dir))
 
-		local restored_mods = {}
-		if restore_mods then
-			restored_mods = wm_mods
-		end
-
 		-- release vim/tmux mods, restore wm mods
-		gears.table.merge(sequence, change_mods(app_mods, restored_mods))
+		local restore_mods = dont_restore_mods and {} or wm_mods
+		gears.table.merge(sequence, change_mods(app_mods, restore_mods))
 
 		return sequence
 	end
