@@ -10,13 +10,7 @@ local function run_key_sequence(seq)
 	for _, s in ipairs(seq) do
 		if s.action == "press" then
 			root.fake_input("key_press", s.key)
-			print("key_press: " .. s.key)
 		elseif s.action == "release" then
-			root.fake_input("key_release", s.key)
-			print("key_release: " .. s.key)
-		elseif s.action == "press_and_release" then
-			root.fake_input("key_release", s.key)
-			root.fake_input("key_press", s.key)
 			root.fake_input("key_release", s.key)
 		end
 	end
@@ -25,53 +19,21 @@ end
 local function run_key_sequence_xdotool(seq)
 	keygrabber.stop()
 
-	-- combine inputs to speed things up
-	local queue = nil
-
-	local combine = false -- @WIP
-
-	print("")
-
 	local run_fn = function(s)
 		if s.action == "press" then
-			if s.is_combined then
-				awful.spawn("xdotool key " .. s.key)
-				print("xdotool key " .. s.key)
-			else
-				awful.spawn("xdotool keydown " .. s.key)
-				print("xdotool keydown " .. s.key)
-			end
+			awful.spawn("xdotool keydown " .. s.key)
 		elseif s.action == "release" then
-			if s.is_combined then
-			else
-				awful.spawn("xdotool keyup " .. s.key)
-				print("xdotool keyup " .. s.key)
-			end
-		elseif s.action == "press_and_release" then
-			awful.spawn("xdotool key " .. s.key)
-			print("key " .. s.key)
+			awful.spawn("xdotool keyup " .. s.key)
 		end
 	end
 
 	for _, s in ipairs(seq) do
-		if queue then
-			if combine and s.action == queue.action then
-				queue.key = string.format("%s+%s", queue.key, s.key)
-				queue.is_combined = true
-			else
-				run_fn(queue)
-				queue = s
-			end
-		else
-			queue = s
-		end
+		run_fn(s)
 	end
-
-	run_fn(queue)
 end
 
 -- get key sequence to transition from current mods to next mods
-local change_mods = function(current, next)
+local function change_mods(current, next)
 	local sequence = {}
 	local intersect = {}
 
@@ -108,6 +70,15 @@ local change_mods = function(current, next)
 	return sequence
 end
 
+local function dump_sequence(seq)
+	local str = "{ "
+	for _, s in ipairs(seq) do
+		str = string.format("%s%s %s, ", str, s.action, s.key)
+	end
+	str = str .. "}"
+	return str
+end
+
 local function new(args)
 	local cfg = args
 		or { up = { "k", "Up" }, down = { "j", "Down" }, left = { "h", "Left" }, right = {
@@ -118,6 +89,8 @@ local function new(args)
 	local mod = cfg.mod or "Mod4"
 	local mod_keysym = cfg.mod_keysym or "Super_L"
 	local focus = cfg.focus or awful.client.focus.global_bydirection
+	local restore_mods = cfg.restore_mods or true
+	local debug = cfg.debug or false
 
 	local wm_keys = {
 		mods = { mod_keysym },
@@ -127,7 +100,7 @@ local function new(args)
 		right = cfg.right,
 	}
 
-	local use_xdotool = cfg.use_xdotool or true
+	local use_xdotool = cfg.use_xdotool or false
 
 	local tmux_keys = cfg.tmux
 		or {
@@ -146,16 +119,21 @@ local function new(args)
 		right = "l",
 	}
 
-	local get_key_sequence = function(current_mods, next_mods, fn, dir)
+	local get_key_sequence = function(wm_mods, app_mods, fn, dir)
 		local sequence = {}
 		-- release wm mods, press vim/tmux mods
-		gears.table.merge(sequence, change_mods(current_mods, next_mods))
+		gears.table.merge(sequence, change_mods(wm_mods, app_mods))
 
 		-- press navigation direction
 		gears.table.merge(sequence, fn(dir))
 
+		local restored_mods = {}
+		if restore_mods then
+			restored_mods = wm_mods
+		end
+
 		-- release vim/tmux mods, restore wm mods
-		gears.table.merge(sequence, change_mods(next_mods, current_mods))
+		gears.table.merge(sequence, change_mods(app_mods, restored_mods))
 
 		return sequence
 	end
@@ -170,7 +148,7 @@ local function new(args)
 
 	local navigate_vim = function(dir)
 		return {
-			--{ action = "release", key = vim_keys[dir] },
+			{ action = "release", key = vim_keys[dir] },
 			{ action = "press", key = vim_keys[dir] },
 			{ action = "release", key = vim_keys[dir] },
 		}
@@ -184,13 +162,24 @@ local function new(args)
 		local client_name = c and c.name or ""
 
 		if string.find(client_name, "%- N?VIM$") then
-			run_fn(get_key_sequence(wm_keys.mods, vim_keys.mods, navigate_vim, dir))
+			local seq = get_key_sequence(wm_keys.mods, vim_keys.mods, navigate_vim, dir)
+			run_fn(seq)
+			if debug then
+				debug(string.format("VIM(%s): %s", dir, dump_sequence(seq)))
+			end
 			return
 		elseif string.find(client_name, "%- TMUX$") then
-			run_fn(get_key_sequence(wm_keys.mods, tmux_keys.mods, navigate_tmux, dir))
+			local seq = get_key_sequence(wm_keys.mods, tmux_keys.mods, navigate_tmux, dir)
+			run_fn(seq)
+			if debug then
+				debug(string.format("TMUX(%s): %s", dir, dump_sequence(seq)))
+			end
 			return
 		else
 			focus(dir)
+			if debug then
+				debug(string.format("WM(%s)", dir))
+			end
 			return
 		end
 	end
