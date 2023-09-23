@@ -4,6 +4,27 @@ local gears = require("gears")
 local unpack = unpack or table.unpack -- luacheck: globals unpack
 local awesome, keygrabber, client, root = awesome, keygrabber, client, root
 local module = {}
+local conversion = nil
+
+local function generate_conversion_map()
+	if conversion then
+		return nil
+	end
+
+	local mods = awesome._modifiers
+	assert(mods)
+
+	conversion = {}
+
+	for mod, keysyms in pairs(mods) do
+		for _, keysym in ipairs(keysyms) do
+			assert(keysym.keysym)
+			conversion[mod] = conversion[mod] or keysym.keysym
+			conversion[keysym.keysym] = mod
+		end
+	end
+	return nil
+end
 
 local function run_key_sequence(seq)
 	keygrabber.stop()
@@ -82,8 +103,9 @@ end
 local function new(args)
 	local cfg = args or {}
 
+	-- legacy definition
 	local mod = cfg.mod or "Mod4"
-	local mod_keysym = cfg.mod_keysym or "Super_L"
+	local mod_keysym = cfg.mod_keysym
 
 	local up = cfg.up or { "k", "Up" }
 	local down = cfg.down or { "j", "Down" }
@@ -94,8 +116,10 @@ local function new(args)
 	local dont_restore_mods = cfg.dont_restore_mods or false
 	local debug = cfg.debug or false
 
+	local mods = mod_keysym and { mod_keysym } or generate_conversion_map()
+
 	local wm_keys = {
-		mods = { mod_keysym },
+		mods = mods,
 		up = up,
 		down = down,
 		left = left,
@@ -122,6 +146,22 @@ local function new(args)
 	}
 
 	local get_key_sequence = function(wm_mods, app_mods, fn, dir)
+		if not wm_mods then
+			-- detect active wm mods
+			local active = awesome._active_modifiers
+			wm_mods = {}
+			for _, m in ipairs(active) do
+				---@diagnostic disable-next-line: need-check-nil
+				local modsym = conversion[m]
+				if modsym ~= "Num_Lock" or modsym ~= "Caps_Lock" then
+					table.insert(wm_mods, modsym)
+					if debug then
+						debug("mod detection: " .. modsym)
+					end
+				end
+			end
+		end
+
 		local sequence = {}
 		-- release wm mods, press vim/tmux mods
 		gears.table.merge(sequence, change_mods(wm_mods, app_mods))
