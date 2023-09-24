@@ -103,7 +103,6 @@ end
 local function new(args)
 	local cfg = args or {}
 
-	-- legacy definition
 	local mod = cfg.mod or "Mod4"
 	local mod_keysym = cfg.mod_keysym
 
@@ -113,8 +112,8 @@ local function new(args)
 	local right = cfg.down or { "l", "Right" }
 
 	local focus = cfg.focus or awful.client.focus.global_bydirection
-	local dont_restore_mods = cfg.dont_restore_mods or false
-	local debug = cfg.debug or false
+	local dont_restore_mods = cfg.dont_restore_mods
+	local debug = cfg.debug
 
 	local mods = mod_keysym and { mod_keysym } or generate_conversion_map()
 
@@ -126,7 +125,8 @@ local function new(args)
 		right = right,
 	}
 
-	local use_xdotool = cfg.use_xdotool or false
+	local use_xdotool = cfg.use_xdotool
+	local use_pstree = cfg.use_pstree or cfg.experimental -- experimental is a legacy parameter
 
 	local tmux_keys = cfg.tmux
 		or {
@@ -139,9 +139,9 @@ local function new(args)
 
 	local vim_keys = cfg.vim or {
 		mods = { "Control_L" },
-		up = "k",
-		down = "j",
 		left = "h",
+		down = "j",
+		up = "k",
 		right = "l",
 	}
 
@@ -223,7 +223,7 @@ local function new(args)
 	end
 
 	-- use pstree to determine type of client (experimental)
-	if cfg.experimental then
+	if use_pstree then
 		navigate = function(dir)
 			local c = client.focus
 			local pid = c and c.pid or -1
