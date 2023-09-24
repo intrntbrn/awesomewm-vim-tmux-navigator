@@ -136,11 +136,11 @@ Add the following to your `tmux.conf`:
 is_vim="ps -o state= -o comm= -t '#{pane_tty}' | grep -iqE '^[^TXZ ]+ +(\\S+\\/)?g?(view|n?vim?x?)(diff)?$'"
 bind-key -n 'C-Left' if-shell "$is_vim" { send-keys C-h } { if-shell -F '#{pane_at_left}'   {run-shell 'awesome-client "awesome.emit_signal(\"navigator::focus\", \"left\")" ' } { select-pane -L } }
 bind-key -n 'C-Right' if-shell "$is_vim" { send-keys C-l } { if-shell -F '#{pane_at_right}'   {run-shell 'awesome-client "awesome.emit_signal(\"navigator::focus\", \"right\")" ' } { select-pane -R } }
-bind-key -n 'C-Up' if-shell "$is_vim" { send-keys C-k } { if-shell -F '#{pane_at_top}'   {run-shell 'awesome-client "awesome.emit_signal(\"navigator::focus\", \"up\")" ' } { select-pane -T } }
+bind-key -n 'C-Up' if-shell "$is_vim" { send-keys C-k } { if-shell -F '#{pane_at_top}'   {run-shell 'awesome-client "awesome.emit_signal(\"navigator::focus\", \"up\")" ' } { select-pane -U } }
 bind-key -n 'C-Down' if-shell "$is_vim" { send-keys C-j } { if-shell -F '#{pane_at_bottom}'   {run-shell 'awesome-client "awesome.emit_signal(\"navigator::focus\", \"down\")" ' } { select-pane -D } }
 bind-key -T copy-mode-vi 'C-Left' if-shell "$is_vim" { send-keys C-h } { if-shell -F '#{pane_at_left}'   {run-shell 'awesome-client "awesome.emit_signal(\"navigator::focus\", \"left\")" ' } { select-pane -L } }
 bind-key -T copy-mode-vi 'C-Right' if-shell "$is_vim" { send-keys C-l } { if-shell -F '#{pane_at_right}'   {run-shell 'awesome-client "awesome.emit_signal(\"navigator::focus\", \"right\")" ' } { select-pane -R } }
-bind-key -T copy-mode-vi 'C-Up' if-shell "$is_vim" { send-keys C-k } { if-shell -F '#{pane_at_top}'   {run-shell 'awesome-client "awesome.emit_signal(\"navigator::focus\", \"up\")" ' } { select-pane -T } }
+bind-key -T copy-mode-vi 'C-Up' if-shell "$is_vim" { send-keys C-k } { if-shell -F '#{pane_at_top}'   {run-shell 'awesome-client "awesome.emit_signal(\"navigator::focus\", \"up\")" ' } { select-pane -U } }
 bind-key -T copy-mode-vi 'C-Down' if-shell "$is_vim" { send-keys C-j } { if-shell -F '#{pane_at_bottom}'   {run-shell 'awesome-client "awesome.emit_signal(\"navigator::focus\", \"down\")" ' } { select-pane -D } }
 
 # set title suffix to "- TMUX" (optional when using pstree method)
