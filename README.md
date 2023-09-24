@@ -90,19 +90,19 @@ lazy.nvim (lua):
  {
 	"intrntbrn/awesomewm-vim-tmux-navigator",
 	event = "VeryLazy",
+	branch = "key_definition",
 	build = "git -C ~/.config/awesome/awesomewm-vim-tmux-navigator/ pull",
-	keys = {
-		{ mode = { "n" }, "<C-h>", ":TmuxNavigateLeft<CR>", { noremap = true, silent = true } },
-		{ mode = { "n" }, "<C-j>", ":TmuxNavigateDown<CR>", { noremap = true, silent = true } },
-		{ mode = { "n" }, "<C-k>", ":TmuxNavigateUp<CR>", { noremap = true, silent = true } },
-		{ mode = { "n" }, "<C-l>", ":TmuxNavigateRight<CR>", { noremap = true, silent = true } },
-	},
 	init = function()
 		vim.g.tmux_navigator_no_mappings = 1
 		-- vim.g.tmux_navigator_no_dynamic_title = 1
 		-- vim.g.tmux_navigator_save_on_switch = 1
 		-- vim.g.tmux_navigator_disable_when_zoomed = 1
 		-- vim.g.tmux_navigator_preserve_zoom = 1
+
+		vim.keymap.set("n", "<C-h>", ":TmuxNavigateLeft<CR>", { noremap = true, silent = true })
+		vim.keymap.set("n", "<C-j>", ":TmuxNavigateDown<CR>", { noremap = true, silent = true })
+		vim.keymap.set("n", "<C-k>", ":TmuxNavigateUp<CR>", { noremap = true, silent = true })
+		vim.keymap.set("n", "<C-l>", ":TmuxNavigateRight<CR>", { noremap = true, silent = true })
 	end,
 }
 ```
