@@ -115,6 +115,9 @@ local function new(args)
 	local dont_restore_mods = cfg.dont_restore_mods
 	local debug = cfg.debug
 
+	local regexpr_dynamic_vim = "%- N?VIM$"
+	local regexpr_dynamic_tmux = "%- TMUX$"
+
 	local mods = mod_keysym and { mod_keysym } or generate_conversion_map()
 
 	local wm_keys = {
@@ -199,14 +202,14 @@ local function new(args)
 		local c = client.focus
 		local client_name = c and c.name or ""
 
-		if string.find(client_name, "%- N?VIM$") then
+		if string.find(client_name, regexpr_dynamic_vim) then
 			local seq = get_key_sequence(wm_keys.mods, vim_keys.mods, navigate_vim, dir)
 			run_fn(seq)
 			if debug then
 				debug(string.format("VIM(%s): %s", dir, dump_sequence(seq)))
 			end
 			return
-		elseif string.find(client_name, "%- TMUX$") then
+		elseif string.find(client_name, regexpr_dynamic_tmux) then
 			local seq = get_key_sequence(wm_keys.mods, tmux_keys.mods, navigate_tmux, dir)
 			run_fn(seq)
 			if debug then
@@ -234,6 +237,7 @@ local function new(args)
 				elseif
 					string.find(out, "[^.*\n]%-n?vim$")
 					or string.find(out, "[^.*\n]%-n?vim%-")
+					or string.find(out, "^neovide%-%-%-nvim")
 					or string.find(out, "^gvim$")
 					or string.find(out, "^gvim%-")
 				then
