@@ -205,12 +205,14 @@ keyboards (qmk or similar software/firmware).
 
 awesomewm:
 
-````lua
-w```
+```lua
+awesome.emit_signal("navigator::navigate", "left")
+awesome.emit_signal("navigator::focus", "right")
+```
 
 shell:
 
 ```bash
 awesome-client 'awesome.emit_signal("navigator::navigate", "up")'
 awesome-client 'awesome.emit_signal("navigator::focus", "down")'
-````
+```
