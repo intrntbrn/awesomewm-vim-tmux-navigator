@@ -99,7 +99,7 @@ lazy.nvim (lua):
 		{ mode = { "n" }, "<C-k>", ":TmuxNavigateUp<CR>", { noremap = true, silent = true } },
 		{ mode = { "n" }, "<C-l>", ":TmuxNavigateRight<CR>", { noremap = true, silent = true } },
 	},
-	config = function()
+	init = function()
 		vim.g.tmux_navigator_no_mappings = 1
 		-- vim.g.tmux_navigator_no_dynamic_title = 1
 		-- vim.g.tmux_navigator_save_on_switch = 1
@@ -112,8 +112,6 @@ lazy.nvim (lua):
 <details><summary>vim-plug (VimL):</summary>
 
 ```viml
-Plug 'intrntbrn/awesomewm-vim-tmux-navigator', { do = 'git -C ~/.config/awesome/awesomewm-vim-tmux-navigator/ pull' }
-
 let g:tmux_navigator_no_mappings = 1
 noremap <silent> <c-h> :<C-U>TmuxNavigateLeft<cr>
 noremap <silent> <c-j> :<C-U>TmuxNavigateDown<cr>
@@ -123,6 +121,8 @@ noremap <silent> <c-l> :<C-U>TmuxNavigateRight<cr>
 " let g:tmux_navigator_save_on_switch = 1
 " let g:tmux_navigator_disable_when_zoomed = 1
 " let g:tmux_navigator_preserve_zoom = 1
+
+Plug 'intrntbrn/awesomewm-vim-tmux-navigator', { do = 'git -C ~/.config/awesome/awesomewm-vim-tmux-navigator/ pull' }
 ```
 
 </details>
