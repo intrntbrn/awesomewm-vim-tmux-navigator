@@ -26,8 +26,6 @@ By default the plugin uses awesomewm's builtin implementation (`root.fake_input`
 
 ## 📦 Installation
 
-The configuration of vim or tmux is optional if you only use one of them.
-
 ### awesomewm:
 
 Clone the repo:
