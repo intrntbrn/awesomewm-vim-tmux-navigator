@@ -115,8 +115,8 @@ local function new(args)
 	local dont_restore_mods = cfg.dont_restore_mods
 	local debug = cfg.debug
 
-	local regexpr_dynamic_vim = "%- N?VIM$"
-	local regexpr_dynamic_tmux = "%- TMUX$"
+	local regexpr_dynamic_vim = cfg.regexpr_dynamic_vim or "%- N?VIM$"
+	local regexpr_dynamic_tmux = cfg.regexpr_dynamic_tmux or "%- TMUX$"
 
 	local mods = mod_keysym and { mod_keysym } or generate_conversion_map()
 
