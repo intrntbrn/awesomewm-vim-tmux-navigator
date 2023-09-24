@@ -193,8 +193,10 @@ There is a race condition if the user was fast enough to release the modifier
 during this operation resulting in _sticky_ mods. This issue is very unlikely to be ever solved.
 
 Restoring mods can be disabled by setting the `dont_restore_mods` option.
-Please note that you can't hold the modifier down for consecutive actions using
-this option. However, this option works very well with combo-keybinds using custom keyboards (qmk similar software/firmware).
+Please note that it's not possible to hold down the modifier for consecutive
+actions using this option.
+However, this side effect can be circumvented by assigning combo-keybinds using custom
+keyboards (qmk or similar software/firmware).
 
 ## 📡 API
 
