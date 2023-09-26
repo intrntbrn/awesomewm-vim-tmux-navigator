@@ -26,6 +26,8 @@ By default the plugin uses awesomewm's builtin implementation (`root.fake_input`
 
 ## 📦 Installation
 
+The configuration of vim or tmux is optional if you only use one of them.
+
 ### awesomewm:
 
 Clone the repo:
@@ -146,7 +148,7 @@ set-option -g set-titles on
 set-option -g set-titles-string '#S: #W - TMUX'
 ```
 
-Custom keybinds have to match your awesomewm configuration.
+Please note that if you're using custom vim keybinds, you have to edit the `{ send-keys <keybind> }` section for each tmux bind to match your vim configuration.
 
 ## ❓ Troubleshooting
 
