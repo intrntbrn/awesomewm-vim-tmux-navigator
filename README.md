@@ -92,7 +92,6 @@ lazy.nvim (lua):
  {
 	"intrntbrn/awesomewm-vim-tmux-navigator",
 	event = "VeryLazy",
-	branch = "key_definition",
 	build = "git -C ~/.config/awesome/awesomewm-vim-tmux-navigator/ pull",
 	init = function()
 		vim.g.tmux_navigator_no_mappings = 1
