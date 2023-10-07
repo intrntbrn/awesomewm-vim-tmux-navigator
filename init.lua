@@ -3,7 +3,9 @@ local glib = require("lgi").GLib
 local gears = require("gears")
 local unpack = unpack or table.unpack -- luacheck: globals unpack
 local awesome, keygrabber, client, root = awesome, keygrabber, client, root
-local module = {}
+
+local M = {}
+
 local conversion = nil
 
 local function generate_conversion_map()
@@ -27,7 +29,7 @@ local function generate_conversion_map()
 end
 
 local function run_key_sequence(seq)
-	keygrabber.stop()
+	keygrabber:stop()
 	for _, s in ipairs(seq) do
 		if s.action == "press" then
 			root.fake_input("key_press", s.key)
@@ -38,7 +40,7 @@ local function run_key_sequence(seq)
 end
 
 local function run_key_sequence_xdotool(seq)
-	keygrabber.stop()
+	keygrabber:stop()
 
 	local run_fn = function(s)
 		if s.action == "press" then
@@ -254,6 +256,10 @@ local function new(args)
 	awesome.connect_signal("navigator::focus", focus)
 	awesome.connect_signal("navigator::navigate", navigate)
 
+	-- add to module
+	M.focus = focus
+	M.navigate = navigate
+
 	-- setup keybinds
 	glib.idle_add(glib.PRIORITY_DEFAULT_IDLE, function()
 		local aw = {}
@@ -271,10 +277,11 @@ local function new(args)
 		end
 		root.keys(awful.util.table.join(root.keys(), unpack(aw)))
 	end)
-	return module
+
+	return M
 end
 
-return setmetatable(module, {
+return setmetatable(M, {
 	__call = function(_, ...)
 		return new(...)
 	end,
