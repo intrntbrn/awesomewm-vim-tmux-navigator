@@ -1,6 +1,7 @@
 local awful = require("awful")
 local glib = require("lgi").GLib
 local gears = require("gears")
+local akeygrabber = require("awful.keygrabber")
 local unpack = unpack or table.unpack -- luacheck: globals unpack
 local awesome, keygrabber, client, root = awesome, keygrabber, client, root
 
@@ -28,8 +29,16 @@ local function generate_conversion_map()
 	return nil
 end
 
+local function stop_keygrabber()
+	local instance = akeygrabber.current_instance
+	if instance then
+		instance:stop()
+	end
+
+	akeygrabber.stop()
+end
+
 local function run_key_sequence(seq)
-	keygrabber:stop()
 	for _, s in ipairs(seq) do
 		if s.action == "press" then
 			root.fake_input("key_press", s.key)
@@ -40,8 +49,6 @@ local function run_key_sequence(seq)
 end
 
 local function run_key_sequence_xdotool(seq)
-	keygrabber:stop()
-
 	local run_fn = function(s)
 		if s.action == "press" then
 			awful.spawn("xdotool keydown " .. s.key)
@@ -122,6 +129,8 @@ local function new(args)
 
 	local mods = mod_keysym and { mod_keysym } or generate_conversion_map()
 
+	local no_global_keybinds = cfg.no_global_keybinds
+
 	local wm_keys = {
 		mods = mods,
 		up = up,
@@ -197,7 +206,14 @@ local function new(args)
 		}
 	end
 
-	local run_fn = use_xdotool and run_key_sequence_xdotool or run_key_sequence
+	local run_fn = function(seq)
+		stop_keygrabber()
+		if use_xdotool then
+			run_key_sequence_xdotool(seq)
+		else
+			run_key_sequence(seq)
+		end
+	end
 
 	-- use dynamic titles to determine type of client (default)
 	local navigate = function(dir)
@@ -261,22 +277,24 @@ local function new(args)
 	M.navigate = navigate
 
 	-- setup keybinds
-	glib.idle_add(glib.PRIORITY_DEFAULT_IDLE, function()
-		local aw = {}
-		for k, v in pairs(cfg) do
-			for _, dir in pairs({ "left", "right", "up", "down" }) do
-				if k == dir then
-					for _, key_name in ipairs(v) do
-						aw[#aw + 1] = awful.key({ mod }, key_name, function()
-							navigate(k)
-						end, { description = "navigate " .. k, group = "client" })
+	if not no_global_keybinds then
+		glib.idle_add(glib.PRIORITY_DEFAULT_IDLE, function()
+			local aw = {}
+			for k, v in pairs(cfg) do
+				for _, dir in pairs({ "left", "right", "up", "down" }) do
+					if k == dir then
+						for _, key_name in ipairs(v) do
+							aw[#aw + 1] = awful.key({ mod }, key_name, function()
+								navigate(k)
+							end, { description = "navigate " .. k, group = "client" })
+						end
+						break
 					end
-					break
 				end
 			end
-		end
-		root.keys(awful.util.table.join(root.keys(), unpack(aw)))
-	end)
+			root.keys(awful.util.table.join(root.keys(), unpack(aw)))
+		end)
+	end
 
 	return M
 end
